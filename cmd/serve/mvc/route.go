@@ -10,4 +10,7 @@ func Route(e *echo.Echo) {
 	// home
 	e.GET("/", c.GetHome)
 
+	// csv
+	e.GET("/csv", c.GetCSV)
+
 }
