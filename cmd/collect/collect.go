@@ -161,6 +161,18 @@ func Pcd() (node *Node, err error) {
 				py = append(py, v...)
 			}
 			cNode.Pinyin = strings.Join(py, " ")
+			if len(gjson.GetBytes(body, fmt.Sprintf("result.%d.city.%d.district", k, kk)).Array()) == 0 {
+				var i int
+				for i = Retry; i > 0; i-- {
+					if cNode.Postcode, err = Search(pNode.ID, cNode.ID, ""); err == nil {
+						break
+					}
+					log.Infof("retry %s_%s: %d", pNode.Name, cNode.Name, Retry-i)
+				}
+				if i == 0 {
+					log.Infof("node %s_%s failed", pNode.Name, cNode.Name)
+				}
+			}
 
 			var wg sync.WaitGroup
 			limitChan := make(chan int, MaxSpider)
@@ -266,6 +278,8 @@ func Search(pid, cid, did string) (code string, e error) {
 		tp := gjson.GetBytes(body, "result.totalpage").String()
 		totalPage, err = strconv.Atoi(tp)
 		if err != nil {
+			log.Info(tp)
+			os.Remove(cacheFile)
 			return
 		}
 		return body, totalPage, nil

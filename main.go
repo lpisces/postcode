@@ -10,8 +10,8 @@ import (
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "bootstrap"
-	app.Usage = "bootstrap for website server development"
+	app.Name = "postcode"
+	app.Usage = "postcode api"
 
 	app.Commands = []cli.Command{
 		{

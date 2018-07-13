@@ -50,8 +50,16 @@ func GetHome(c echo.Context) error {
 		return c.JSON(http.StatusOK, r)
 	}
 
+	if len(code) != 6 {
+		return c.JSON(http.StatusOK, r)
+	}
+
 	for _, v := range node.Children {
 		for _, vv := range v.Children {
+			if strings.Contains(vv.Postcode, code) {
+				r.Status = 0
+				r.Addr = append(r.Addr, fmt.Sprintf("%s,%s", v.Name, vv.Name))
+			}
 			for _, vvv := range vv.Children {
 				if strings.Contains(vvv.Postcode, code) {
 					r.Status = 0
