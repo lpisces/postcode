@@ -70,6 +70,28 @@ func GetHome(c echo.Context) error {
 			}
 		}
 	}
+
+	if len(r.Addr) == 0 && strings.HasSuffix(code, "000") {
+		codeBytes := []byte(code)
+		codeBytes[5] = '1'
+		code = string(codeBytes)
+
+		for _, v := range node.Children {
+			for _, vv := range v.Children {
+				if strings.Contains(vv.Postcode, code) {
+					r.Status = 0
+					r.Addr = append(r.Addr, fmt.Sprintf("%s,%s", v.Name, vv.Name))
+				}
+				for _, vvv := range vv.Children {
+					if strings.Contains(vvv.Postcode, code) {
+						r.Status = 0
+						r.Addr = append(r.Addr, fmt.Sprintf("%s,%s,%s", v.Name, vv.Name, vvv.Name))
+					}
+				}
+			}
+		}
+	}
+
 	return c.JSON(http.StatusOK, r)
 }
 
